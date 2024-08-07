@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tab Group Snapshot Manager</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body {
+      width: 400px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+
+    button {
+      margin: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      border-radius: 5px;
+      background-color: lightgray;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e0e0e0;
+    }
+
+    #groupList {
+      margin-top: 10px;
+    }
+
+    .group-item {
+      margin-bottom: 5px;
+    }
+
+    #snapshotList {
+      margin-top: 10px;
+    }
+
+    .snapshot-item {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .snapshot-info {
+      flex-grow: 1;
+    }
+
+    .snapshot-name {
+      font-weight: bold;
+      display: block;
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+
+    #takeSnapshot {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    #takeSnapshot .material-icons {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Tab Group Snapshot Manager</h2>
+  <div id="groupList"></div>
+  <button id="takeSnapshot"><i class="material-icons">add_photo_alternate</i> Take Snapshot</button>
+  <div id="snapshotList"></div>
+  <script src="popup.js"></script>
+</body>
+
+</html>
