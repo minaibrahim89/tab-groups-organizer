@@ -60,19 +60,40 @@ function restoreSnapshot(snapshotIndex, callback) {
 
         chrome.windows.getCurrent({ populate: true }, (currentWindow) => {
             chrome.tabGroups.query({ windowId: currentWindow.id }, (existingGroups) => {
-                const groupsToClose = getGroupsToClose(existingGroups, snapshot);
-
-                createTabsForSnapshot(snapshot, currentWindow, () => {
-                    closeTabsInGroups(groupsToClose, callback);
+                const promises = snapshot.groups.flatMap(snapshotGroup => {
+                    return Promise.all(createTabsForSnapshotGroup(snapshotGroup, currentWindow)).then(newTabsIds => {
+                        addTabsToGroup(newTabsIds, snapshotGroup, () => {
+                            const groupToClose = getMatchingOpenGroup(existingGroups, snapshotGroup);
+                            if (groupToClose) {
+                                closeTabsInGroups([groupToClose]);
+                            }
+                        });
+                    });
                 });
+
+                Promise.all(promises).then(() => callback({ success: true }));
             });
         });
     });
 }
 
-function getGroupsToClose(existingGroups, snapshot) {
-    return existingGroups.filter(existingGroup =>
-        snapshot.groups.some(group => group.title === existingGroup.title));
+function restoreOpenFromSnapshot(snapshotIndex, callback) {
+    chrome.storage.local.get(['snapshots'], (result) => {
+        const snapshots = result.snapshots || [];
+        const snapshot = snapshots[snapshotIndex];
+
+        if (!snapshot) {
+            callback({ error: "Snapshot not found" });
+            return;
+        }
+
+        chrome.windows.getCurrent({ populate: true }, (currentWindow) => {
+            chrome.tabGroups.query({ windowId: currentWindow.id }, (existingGroups) => {
+                const existingGroupsToRestore = getMatchingOpenGroups(existingGroups, snapshot);
+                restoreGroups(existingGroupsToRestore, snapshot, currentWindow, callback);
+            });
+        });
+    });
 }
 
 function closeTabsInGroups(groupsToClose, callback) {
@@ -87,7 +108,7 @@ function closeTabsInGroups(groupsToClose, callback) {
     );
 
     Promise.all(tabIdsToClosePromises).then(() => {
-        chrome.tabs.remove(tabIdsToClose, callback({ success: true }));
+        chrome.tabs.remove(tabIdsToClose, callback);
     });
 }
 
@@ -127,30 +148,18 @@ function addTabsToGroup(tabIds, group, callback) {
     });
 }
 
-function restoreOpenFromSnapshot(snapshotIndex, callback) {
-    chrome.storage.local.get(['snapshots'], (result) => {
-        const snapshots = result.snapshots || [];
-        const snapshot = snapshots[snapshotIndex];
-
-        if (!snapshot) {
-            callback({ error: "Snapshot not found" });
-            return;
-        }
-
-        chrome.windows.getCurrent({ populate: true }, (currentWindow) => {
-            chrome.tabGroups.query({ windowId: currentWindow.id }, (existingGroups) => {
-                const existingGroupsToRestore = getMatchingOpenGroups(existingGroups, snapshot);
-                restoreGroups(existingGroupsToRestore, snapshot, currentWindow, callback);
-            });
-        });
-    });
-}
-
 function getMatchingOpenGroups(existingGroups, snapshot) {
     return existingGroups.filter(existingGroup =>
         snapshot.groups.find(snapshotGroup =>
             snapshotGroup.title === existingGroup.title
-            && snapshotGroup.color === existingGroup.color))
+            && snapshotGroup.color === existingGroup.color));
+}
+
+function getMatchingOpenGroup(existingGroups, snapshotGroup) {
+    return existingGroups.find(existingGroup => 
+        existingGroup.title === snapshotGroup.title
+        && existingGroup.color == snapshotGroup.color
+    );
 }
 
 function restoreGroups(existingGroupsToRestore, snapshot, currentWindow, callback) {
