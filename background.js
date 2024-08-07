@@ -63,11 +63,7 @@ function restoreSnapshot(snapshotIndex, callback) {
                 const groupsToClose = existingGroups.filter(existingGroup =>
                     snapshot.groups.some(group => group.title === existingGroup.title));
 
-                console.log("existingGroups", existingGroups);
-                console.log("snapshot", snapshot);
-                console.log("groupsToClose", groupsToClose);
-
-                const closeTabsPromises = groupsToClose.map(group => {
+                const tabIdsToClosePromises = groupsToClose.map(group => {
                     return new Promise((resolve) => {
                         chrome.tabs.query({ groupId: group.id }, (tabs) => {
                             tabs.forEach(tab => tabIdsToClose.push(tab.id));
@@ -77,7 +73,7 @@ function restoreSnapshot(snapshotIndex, callback) {
                 });
 
                 // Close tabs in existing groups
-                Promise.all(closeTabsPromises).then(() => {
+                Promise.all(tabIdsToClosePromises).then(() => {
                     chrome.tabs.remove(tabIdsToClose, () => {
                         // Create new tabs for the snapshot
                         const createTabPromises = snapshot.groups.flatMap(group =>
