@@ -26,12 +26,20 @@ function createGroupDiv(group) {
     } else {
       selectedGroups.delete(group.id);
     }
+
+    getTakeSnapshotButton().disabled = !anyGroupCheckBoxChecked();
   });
 
   groupDiv.appendChild(checkbox);
   groupDiv.appendChild(document.createTextNode(` ${group.title} (${group.color})`));
 
   return groupDiv;
+}
+
+function anyGroupCheckBoxChecked() {
+  const allCheckBoxes = Array.from(document.querySelectorAll('div.group-item > input[type=checkbox]'));
+
+  return allCheckBoxes.some(chk => chk.checked);
 }
 
 function updateSnapshotList() {
@@ -53,12 +61,12 @@ function createSnapshotDiv(snapshot, index) {
 
   const infoDiv = document.createElement('div');
   infoDiv.title = snapshot.groups.map(group => `${group.title} (${group.tabs.length} tabs)`).join('\n');
-  
+
   const totalTabs = snapshot.groups.reduce((sum, group) => sum + group.tabs.length, 0);
 
   const nameSpan = document.createElement('span');
   nameSpan.textContent = snapshot.name || `Snapshot ${index + 1}`;
-  nameSpan.className = 'snapshot-name';  
+  nameSpan.className = 'snapshot-name';
   infoDiv.appendChild(nameSpan);
 
   infoDiv.appendChild(document.createTextNode(` (${snapshot.groups.length} groups, ${totalTabs} tabs)`));
@@ -109,7 +117,7 @@ function createButton(icon, title, onClick) {
   return button;
 }
 
-document.getElementById('takeSnapshot').addEventListener('click', () => {
+getTakeSnapshotButton().addEventListener('click', () => {
   const snapshotName = prompt('Enter a name for this snapshot:', `Snapshot ${new Date().toLocaleString()}`);
   if (snapshotName !== null) {
     chrome.runtime.sendMessage({
@@ -121,6 +129,10 @@ document.getElementById('takeSnapshot').addEventListener('click', () => {
     });
   }
 });
+
+function getTakeSnapshotButton() {
+  return document.getElementById('takeSnapshot');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   updateGroupList();
