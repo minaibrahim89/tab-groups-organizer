@@ -83,6 +83,11 @@ function createSnapshotButtons(snapshot, index) {
     chrome.runtime.sendMessage({ action: "restoreSnapshot", snapshotIndex: index });
   });
   buttonsDiv.appendChild(restoreButton);
+
+  const restoreOpenButton = createButton('merge_type', 'Merge with open tab groups', () => {
+    chrome.runtime.sendMessage({ action: "restoreOpenFromSnapshot", snapshotIndex: index });
+  });
+  buttonsDiv.appendChild(restoreOpenButton);
   
   const deleteButton = createButton('delete', 'Delete', () => {
     if (confirm('Are you sure you want to delete this snapshot?')) {
