@@ -135,6 +135,13 @@ function createSnapshotButtons(snapshot, index) {
   });
   buttonsDiv.appendChild(restoreOpenButton);
 
+  const closeButton = createButton('close', 'Close open tab groups from that snapshot', () => {
+    if (confirm('Are you sure you want to close all open tab groups from this snapshot?')) {
+      chrome.runtime.sendMessage({ action: "closeSnapshot", snapshotIndex: index });
+    }
+  });
+  buttonsDiv.appendChild(closeButton);
+
   const deleteButton = createButton('delete', 'Delete', () => {
     if (confirm('Are you sure you want to delete this snapshot?')) {
       chrome.runtime.sendMessage({ action: "deleteSnapshot", snapshotIndex: index }, updateSnapshotList);

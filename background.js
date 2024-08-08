@@ -13,6 +13,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action === "restoreOpenFromSnapshot") {
         restoreSnapshot(request.snapshotIndex, true, sendResponse);
         return true;
+    } else if (request.action === "closeSnapshot") {
+        closeOpenTabsFromSnapshot(request.snapshotIndex);
+        return true;
     } else if (request.action === "deleteSnapshot") {
         deleteSnapshot(request.snapshotIndex, sendResponse);
         return true;
@@ -117,7 +120,39 @@ function restoreMatchingGroups(matchingExistingGroups, snapshot, currentWindow, 
     Promise.all(tabRestorePromises).then(() => callback({ success: true }));
 }
 
+
+function closeOpenTabsFromSnapshot(snapshotIndex) {
+    chrome.storage.local.get(['snapshots'], (result) => {
+        let snapshots = result.snapshots || [];
+        if (snapshotIndex >= 0 && snapshotIndex < snapshots.length) {
+            const snapshot = snapshots[snapshotIndex];
+            chrome.windows.getCurrent({ populate: true }, (currentWindow) => {
+                chrome.tabGroups.query({ windowId: currentWindow.id }, (existingGroups) => {
+                    const groupsToClose = getAllMatchingOpenGroupsForSnapshot(existingGroups, snapshot);
+                    queryTabsIdsToCloseInGroups(groupsToClose, (tabIdsToClose) => {
+                        chrome.tabs.query({}, (allOpenTabs) => {
+                            if (allOpenTabs.length === tabIdsToClose.length) {
+                                chrome.tabs.create({ windowId: currentWindow.id }, () => {
+                                    chrome.tabs.remove(tabIdsToClose);
+                                });
+                            } else {
+                                chrome.tabs.remove(tabIdsToClose);
+                            }
+                        })
+                    });                    
+                });
+            });
+        }
+    });
+}
+
 function closeTabsInGroups(groupsToClose, callback) {
+    queryTabsIdsToCloseInGroups(groupsToClose, (tabIdsToClose) => {
+        chrome.tabs.remove(tabIdsToClose, callback);
+    });
+}
+
+function queryTabsIdsToCloseInGroups(groupsToClose, callback) {
     const tabIdsToClose = [];
     const tabIdsToClosePromises = groupsToClose.map(group =>
         new Promise((resolve) => {
@@ -128,9 +163,7 @@ function closeTabsInGroups(groupsToClose, callback) {
         })
     );
 
-    Promise.all(tabIdsToClosePromises).then(() => {
-        chrome.tabs.remove(tabIdsToClose, callback);
-    });
+    Promise.all(tabIdsToClosePromises).then(() => callback(tabIdsToClose));
 }
 
 function createTabsForSnapshotGroup(group, currentWindow) {
