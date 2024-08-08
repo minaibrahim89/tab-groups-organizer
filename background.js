@@ -19,6 +19,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action === "renameSnapshot") {
         renameSnapshot(request.snapshotIndex, request.newName, sendResponse);
         return true;
+    } else if (request.action === "exportSnapshots") {
+        exportSnapshots(request.snapshotIndices, sendResponse);
+        return true;
+    } else if (request.action === "importSnapshots") {
+        importSnapshots(request.snapshots, sendResponse);
+        return true;
     }
 });
 
@@ -180,5 +186,23 @@ function renameSnapshot(snapshotIndex, newName, callback) {
         } else {
             callback({ error: "Invalid snapshot index" });
         }
+    });
+}
+
+function exportSnapshots(snapshotIndices, callback) {
+    chrome.storage.local.get(['snapshots'], (result) => {
+        const allSnapshots = result.snapshots || [];
+        const selectedSnapshots = snapshotIndices.map(index => allSnapshots[index]).filter(Boolean);
+        callback({ success: true, snapshots: selectedSnapshots });
+    });
+}
+
+function importSnapshots(importedSnapshots, callback) {
+    chrome.storage.local.get(['snapshots'], (result) => {
+        let snapshots = result.snapshots || [];
+        snapshots = snapshots.concat(importedSnapshots);
+        chrome.storage.local.set({ snapshots: snapshots }, () => {
+            callback({ success: true });
+        });
     });
 }

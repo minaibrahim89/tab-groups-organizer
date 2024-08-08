@@ -1,4 +1,5 @@
 let selectedGroups = new Set();
+let selectedSnapshots = new Set();
 
 function updateGroupList() {
   chrome.runtime.sendMessage({ action: "listGroups" }, (response) => {
@@ -59,23 +60,48 @@ function createSnapshotDiv(snapshot, index) {
   const snapshotDiv = document.createElement('div');
   snapshotDiv.className = 'snapshot-item';
 
-  const infoDiv = document.createElement('div');
-  infoDiv.title = snapshot.groups.map(group => `${group.title} (${group.tabs.length} tabs)`).join('\n');
-
   const totalTabs = snapshot.groups.reduce((sum, group) => sum + group.tabs.length, 0);
 
+  const leftDiv = document.createElement('div');
+  leftDiv.className = 'snapshot-item-left';
+  leftDiv.title = snapshot.groups.map(group => `${group.title} (${group.tabs.length} tabs)`).join('\n');
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = selectedSnapshots.has(index);
+  checkbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      selectedSnapshots.add(index);
+    } else {
+      selectedSnapshots.delete(index);
+    }
+
+    getExportButton().disabled = !anySnapshotCheckBoxChecked();
+  });
+  leftDiv.appendChild(checkbox);
+
+  const infoDiv = document.createElement('div');
+  infoDiv.className = 'snapshot-info';
+  
   const nameSpan = document.createElement('span');
   nameSpan.textContent = snapshot.name || `Snapshot ${index + 1}`;
   nameSpan.className = 'snapshot-name';
   infoDiv.appendChild(nameSpan);
 
   infoDiv.appendChild(document.createTextNode(` (${snapshot.groups.length} groups, ${totalTabs} tabs)`));
-  snapshotDiv.appendChild(infoDiv);
+  leftDiv.appendChild(infoDiv);
+  snapshotDiv.appendChild(leftDiv);
 
   const buttonsDiv = createSnapshotButtons(snapshot, index);
   snapshotDiv.appendChild(buttonsDiv);
 
   return snapshotDiv;
+}
+
+function anySnapshotCheckBoxChecked() {
+  const allCheckBoxes = Array.from(document.querySelectorAll('div.snapshot-info > input[type=checkbox]'));
+
+  return allCheckBoxes.some(chk => chk.checked);
 }
 
 function createSnapshotButtons(snapshot, index) {
@@ -130,8 +156,61 @@ getTakeSnapshotButton().addEventListener('click', () => {
   }
 });
 
+getExportButton().addEventListener('click', () => {
+  chrome.runtime.sendMessage({
+    action: "exportSnapshots",
+    snapshotIndices: Array.from(selectedSnapshots)
+  }, (response) => {
+    if (response.success) {
+      const blob = new Blob([JSON.stringify(response.snapshots, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tab_group_snapshots.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      alert('Failed to export snapshots.');
+    }
+  });
+});
+
+document.getElementById('importSnapshots').addEventListener('click', () => {
+  document.getElementById('importInput').click();
+});
+
+document.getElementById('importInput').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedSnapshots = JSON.parse(e.target.result);
+        chrome.runtime.sendMessage({
+          action: "importSnapshots",
+          snapshots: importedSnapshots
+        }, (response) => {
+          if (response.success) {
+            alert('Snapshots imported successfully.');
+            updateSnapshotList();
+          } else {
+            alert('Failed to import snapshots.');
+          }
+        });
+      } catch (error) {
+        alert('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+});
+
 function getTakeSnapshotButton() {
   return document.getElementById('takeSnapshot');
+}
+
+function getExportButton() {
+  return document.getElementById('exportSnapshots');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
