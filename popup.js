@@ -44,6 +44,7 @@ function anyGroupCheckBoxChecked() {
 }
 
 function updateSnapshotList() {
+  selectedSnapshots.clear();
   chrome.storage.local.get(['snapshots'], (result) => {
     const snapshots = result.snapshots || [];
     const snapshotList = document.getElementById('snapshotList');
@@ -66,29 +67,10 @@ function createSnapshotDiv(snapshot, index) {
   leftDiv.className = 'snapshot-item-left';
   leftDiv.title = snapshot.groups.map(group => `${group.title} (${group.tabs.length} tabs)`).join('\n');
 
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.checked = selectedSnapshots.has(index);
-  checkbox.addEventListener('change', (e) => {
-    if (e.target.checked) {
-      selectedSnapshots.add(index);
-    } else {
-      selectedSnapshots.delete(index);
-    }
-
-    getExportButton().disabled = !anySnapshotCheckBoxChecked();
-  });
+  const checkbox = createSnapshotCheckbox(index);
   leftDiv.appendChild(checkbox);
 
-  const infoDiv = document.createElement('div');
-  infoDiv.className = 'snapshot-info';
-  
-  const nameSpan = document.createElement('span');
-  nameSpan.textContent = snapshot.name || `Snapshot ${index + 1}`;
-  nameSpan.className = 'snapshot-name';
-  infoDiv.appendChild(nameSpan);
-
-  infoDiv.appendChild(document.createTextNode(` (${snapshot.groups.length} groups, ${totalTabs} tabs)`));
+  const infoDiv = createInfoDiv(snapshot, index, totalTabs);
   leftDiv.appendChild(infoDiv);
   snapshotDiv.appendChild(leftDiv);
 
@@ -98,8 +80,36 @@ function createSnapshotDiv(snapshot, index) {
   return snapshotDiv;
 }
 
+function createSnapshotCheckbox(index) {
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = selectedSnapshots.has(index);
+  checkbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      selectedSnapshots.add(index);
+    } else {
+      selectedSnapshots.delete(index);
+    }
+    getExportButton().disabled = !anySnapshotCheckBoxChecked();
+  });
+  return checkbox;
+}
+
+function createInfoDiv(snapshot, index, totalTabs) {
+  const infoDiv = document.createElement('div');
+  infoDiv.className = 'snapshot-info';
+  
+  const nameSpan = document.createElement('span');
+  nameSpan.textContent = snapshot.name || `Snapshot ${index + 1}`;
+  nameSpan.className = 'snapshot-name';
+  infoDiv.appendChild(nameSpan);
+
+  infoDiv.appendChild(document.createTextNode(` (${snapshot.groups.length} groups, ${totalTabs} tabs)`));
+  return infoDiv;
+}
+
 function anySnapshotCheckBoxChecked() {
-  const allCheckBoxes = Array.from(document.querySelectorAll('div.snapshot-info > input[type=checkbox]'));
+  const allCheckBoxes = Array.from(document.querySelectorAll('div.snapshot-item-left > input[type=checkbox]'));
 
   return allCheckBoxes.some(chk => chk.checked);
 }
