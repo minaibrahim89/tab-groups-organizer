@@ -186,10 +186,11 @@ getExportButton().addEventListener('click', () => {
 });
 
 document.getElementById('importSnapshots').addEventListener('click', () => {
+  getImportInput().value = '';
   document.getElementById('importInput').click();
 });
 
-document.getElementById('importInput').addEventListener('change', (event) => {
+getImportInput().addEventListener('change', (event) => {
   const file = event.target.files[0];
   if (file) {
     const reader = new FileReader();
@@ -214,6 +215,10 @@ document.getElementById('importInput').addEventListener('change', (event) => {
     reader.readAsText(file);
   }
 });
+
+function getImportInput() {
+  return document.getElementById('importInput');
+}
 
 function getTakeSnapshotButton() {
   return document.getElementById('takeSnapshot');

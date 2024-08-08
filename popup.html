@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Tab Group Snapshot Manager</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
-    body { 
-      width: 400px; 
-      padding: 10px; 
+    body {
+      width: 400px;
+      padding: 10px;
       font-family: Arial, sans-serif;
     }
-    button { 
-      margin: 5px; 
+
+    button {
+      margin: 5px;
       background: none;
       border: none;
       cursor: pointer;
@@ -21,34 +23,52 @@
       border-radius: 50%;
       transition: background-color 0.3s;
     }
+
     button:hover {
       background-color: #e0e0e0;
     }
-    #groupList { margin-top: 10px; }
-    .group-item { margin-bottom: 5px; }
-    #snapshotList { margin-top: 10px; }
-    .snapshot-item { 
-      margin-bottom: 10px; 
+
+    #groupList {
+      margin-top: 10px;
+    }
+
+    .group-item {
+      margin-bottom: 5px;
+    }
+
+    #snapshotList {
+      margin-top: 10px;
+    }
+
+    .snapshot-item {
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
+
     .snapshot-item-left {
       display: flex;
       gap: 5px;
     }
+
     .snapshot-info {
       display: flex;
-      flex-direction: column;      
+      flex-direction: column;
     }
-    .snapshot-name { 
-      font-weight: bold; 
+
+    .snapshot-name {
+      font-weight: bold;
       margin-right: 10px;
     }
+
     .material-icons {
       font-size: 18px;
     }
-    #takeSnapshot, #exportSnapshots, #importSnapshots {
+
+    #takeSnapshot,
+    #exportSnapshots,
+    #importSnapshots {
       background-color: #4CAF50;
       color: white;
       padding: 10px;
@@ -58,22 +78,40 @@
       margin-top: 10px;
       margin-bottom: 10px;
     }
-    #takeSnapshot .material-icons, #exportSnapshots .material-icons, #importSnapshots .material-icons {
+
+    #takeSnapshot:disabled,
+    #exportSnapshots:disabled,
+    #importSnapshots:disabled {
+      background-color: lightgray;
+    }
+
+    #takeSnapshot .material-icons,
+    #exportSnapshots .material-icons,
+    #importSnapshots .material-icons {
       margin-right: 5px;
     }
+
+    #snapshotActions {
+      display: flex;
+    }
+
     #importInput {
       display: none;
     }
   </style>
 </head>
+
 <body>
   <h2>Tab Group Snapshot Manager</h2>
   <div id="groupList"></div>
-  <button id="takeSnapshot" disabled><i class="material-icons">add_photo_alternate</i> Take Snapshot</button>
-  <button id="exportSnapshots" disabled><i class="material-icons">file_download</i> Export Selected</button>
-  <button id="importSnapshots"><i class="material-icons">file_upload</i> Import Snapshots</button>
   <input type="file" id="importInput" accept=".json">
+  <button id="takeSnapshot" disabled><i class="material-icons">add_photo_alternate</i> Take Snapshot</button>
   <div id="snapshotList"></div>
+  <div id="snapshotActions">
+    <button id="importSnapshots"><i class="material-icons">file_upload</i> Import Snapshots</button>
+    <button id="exportSnapshots" disabled><i class="material-icons">file_download</i> Export Selected</button>
+  </div>
   <script src="popup.js"></script>
 </body>
+
 </html>
