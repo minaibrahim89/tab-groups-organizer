@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Tab Group Snapshot Manager",
+  "name": "Tab Groups Manager",
   "version": "1.1",
-  "description": "Create and restore snapshots of tab groups",
+  "description": "Create, restore or close open tabs from snapshots of tab groups.",
   "permissions": [
     "tabs",
     "tabGroups",
