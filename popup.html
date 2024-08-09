@@ -5,10 +5,27 @@
   <title>Tab Groups Manager</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
+    html {
+      padding: 0;
+    }
+
     body {
       width: 400px;
-      padding: 10px;
+      padding: 0px;
+      margin: 0px;
       font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      background-color: #4CAF50;
+      padding: 16px 16px;
+      margin: 0;
+      color: white;
+    }
+
+    main {
+      padding: 16px;
+      padding-top: 8px;
     }
 
     button {
@@ -33,7 +50,14 @@
     }
 
     .group-item {
-      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;      
+    }
+
+    .group-item * {
+      cursor: pointer;
     }
 
     #snapshotList {
@@ -102,15 +126,17 @@
 </head>
 
 <body>
-  <h2>Tab Groups Manager</h2>
-  <div id="groupList"></div>
-  <input type="file" id="importInput" accept=".json">
-  <button id="takeSnapshot" disabled><i class="material-icons">add_photo_alternate</i> Take Snapshot</button>
-  <div id="snapshotList"></div>
-  <div id="snapshotActions">
-    <button id="importSnapshots"><i class="material-icons">file_upload</i> Import Snapshots</button>
-    <button id="exportSnapshots" disabled><i class="material-icons">file_download</i> Export Selected</button>
-  </div>
+  <h1>Tab Groups Manager</h1>
+  <main>
+    <div id="groupList"></div>
+    <input type="file" id="importInput" accept=".json">
+    <button id="takeSnapshot" disabled><i class="material-icons">add_photo_alternate</i> Take Snapshot</button>
+    <div id="snapshotList"></div>
+    <div id="snapshotActions">
+      <button id="importSnapshots"><i class="material-icons">file_upload</i> Import Snapshots</button>
+      <button id="exportSnapshots" disabled><i class="material-icons">file_download</i> Export Selected</button>
+    </div>
+  </main>
   <script src="popup.js"></script>
 </body>
 

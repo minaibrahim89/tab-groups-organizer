@@ -15,10 +15,11 @@ function updateGroupList() {
 
 function createGroupDiv(group) {
   const groupDiv = document.createElement('div');
-  groupDiv.className = 'group-item';
+  groupDiv.className = 'group-item';  
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
+  checkbox.id = group.id;
   checkbox.value = group.id;
   checkbox.checked = selectedGroups.has(group.id);
   checkbox.addEventListener('change', (e) => {
@@ -31,8 +32,14 @@ function createGroupDiv(group) {
     getTakeSnapshotButton().disabled = !anyGroupCheckBoxChecked();
   });
 
+  const label = document.createElement('label');
+  label.for = group.id;
+  label.innerText = `${group.title} (${group.color})`;
+  label.addEventListener('click', () => {
+    groupDiv.querySelector('input[type=checkbox]').click();
+  });
   groupDiv.appendChild(checkbox);
-  groupDiv.appendChild(document.createTextNode(` ${group.title} (${group.color})`));
+  groupDiv.appendChild(label);
 
   return groupDiv;
 }
