@@ -78,6 +78,9 @@ function createSnapshotDiv(snapshot, index) {
   leftDiv.appendChild(checkbox);
 
   const infoDiv = createInfoDiv(snapshot, index, totalTabs);
+  infoDiv.addEventListener('click', () => {
+    checkbox.click();
+  });
   leftDiv.appendChild(infoDiv);
   snapshotDiv.appendChild(leftDiv);
 
@@ -109,7 +112,7 @@ function createInfoDiv(snapshot, index, totalTabs) {
   const nameSpan = document.createElement('span');
   nameSpan.textContent = snapshot.name || `Snapshot ${index + 1}`;
   nameSpan.className = 'snapshot-name';
-  infoDiv.appendChild(nameSpan);
+  infoDiv.appendChild(nameSpan);  
 
   infoDiv.appendChild(document.createTextNode(` (${snapshot.groups.length} groups, ${totalTabs} tabs)`));
   return infoDiv;
