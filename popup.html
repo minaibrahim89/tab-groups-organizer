@@ -11,14 +11,13 @@
     }
 
     body {
-      width: 400px;
+      width: 480px;
       padding: 0px;
       margin: 0px;
       font-family: Arial, sans-serif;
     }
 
     h1 {
-      background-color: #4CAF50;
       padding: 16px 16px;
       margin: 0;
       color: white;
@@ -46,6 +45,34 @@
       background-color: #e0e0e0;
     }
 
+    .grey {
+      background-color: #5f6368;
+    }
+    .blue {
+      background-color: #1a73e8;
+    }
+    .red {
+      background-color: #d93025;
+    }
+    .yellow {
+      background-color: #f9ab00;
+    }
+    .green {
+      background-color: #188038;
+    }
+    .pink {
+      background-color: #d01884;
+    }
+    .purple {
+      background-color: #a142f4;
+    }
+    .cyan {
+      background-color: #007b83;
+    }
+    .orange {
+      background-color: #fa903e;
+    }
+
     #groupList {
       margin-top: 10px;
     }
@@ -55,6 +82,13 @@
       align-items: center;
       gap: 5px;
       margin-bottom: 5px;      
+    }
+
+    .group-item label {
+      border: 1px solid transparent;
+      border-radius: 5px;
+      padding: 8px;
+      color: white;
     }
     
     #snapshotList {
@@ -86,7 +120,8 @@
 
     .snapshot-name {
       font-weight: bold;
-      margin-right: 10px;
+      margin-right: 0;
+      max-width: 220px;
     }
 
     .material-icons {
@@ -96,7 +131,7 @@
     #takeSnapshot,
     #exportSnapshots,
     #importSnapshots {
-      background-color: #4CAF50;
+      background-color: #1a73e8;
       color: white;
       padding: 10px;
       border-radius: 5px;
@@ -129,7 +164,7 @@
   </head>
 
   <body>
-    <h1>Tab Groups Manager</h1>
+    <h1 class="blue">Tab Groups Manager</h1>
     <main>
       <div id="groupList"></div>
       <input type="file" id="importInput" accept=".json">

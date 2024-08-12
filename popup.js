@@ -34,7 +34,8 @@ function createGroupDiv(group) {
 
   const label = document.createElement('label');
   label.for = group.id;
-  label.innerText = `${group.title} (${group.color})`;
+  label.className = group.color;
+  label.innerText = `${group.title}`;
   label.addEventListener('click', () => {
     groupDiv.querySelector('input[type=checkbox]').click();
   });
